@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games with ChatGPT</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        h1 { color: #333; }
+        .game-container, .chat-container { border: 1px solid #ddd; border-radius: 10px; margin: 20px auto; padding: 20px; width: 300px; background-color: #fff; }
+        .button { display: inline-block; margin: 5px; padding: 10px 20px; background-color: #333; color: #fff; border: none; cursor: pointer; border-radius: 5px; }
+        .message { padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .user-message { background-color: #d4f1f9; text-align: left; }
+        .bot-message { background-color: #e1ffe1; text-align: left; }
+    </style>
+</head>
+<body>
+
+<h1>Welcome to Fun Games with ChatGPT</h1>
+
+<!-- Number Guessing Game -->
+<div class="game-container">
+    <h2>Number Guessing Game</h2>
+    <p>Guess a number between 1 and 10:</p>
+    <input type="number" id="guessInput" min="1" max="10">
+    <button class="button" onclick="playGuessingGame()">Guess</button>
+    <p id="guessResult"></p>
+</div>
+
+<!-- Rock-Paper-Scissors Game -->
+<div class="game-container">
+    <h2>Rock-Paper-Scissors</h2>
+    <button class="button" onclick="playRPS('rock')">Rock</button>
+    <button class="button" onclick="playRPS('paper')">Paper</button>
+    <button class="button" onclick="playRPS('scissors')">Scissors</button>
+    <p id="rpsResult"></p>
+</div>
+
+<!-- Chat Interface -->
+<div class="chat-container">
+    <h2>Chat with ChatGPT</h2>
+    <div id="chatBox"></div>
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button class="button" onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    // Number Guessing Game
+    function playGuessingGame() {
+        const userGuess = document.getElementById('guessInput').value;
+        const randomNumber = Math.floor(Math.random() * 10) + 1;
+        document.getElementById('guessResult').innerText = (userGuess == randomNumber) ? 'Correct! You guessed the number!' : 'Wrong! The correct number was ' + randomNumber;
+    }
+
+    // Rock-Paper-Scissors Game
+    function playRPS(userChoice) {
+        const choices = ['rock', 'paper', 'scissors'];
+        const computerChoice = choices[Math.floor(Math.random() * 3)];
+        let result = '';
+        if (userChoice === computerChoice) result = 'It\'s a tie!';
+        else if ((userChoice === 'rock' && computerChoice === 'scissors') || (userChoice === 'scissors' && computerChoice === 'paper') || (userChoice === 'paper' && computerChoice === 'rock')) 
+            result = 'You win! ' + userChoice + ' beats ' + computerChoice;
+        else 
+            result = 'You lose! ' + computerChoice + ' beats ' + userChoice;
+        document.getElementById('rpsResult').innerText = result;
+    }
+
+    // Chat with ChatGPT
+    async function sendMessage() {
+        const userMessage = document.getElementById('userInput').value;
+        if (!userMessage) return;
+        
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `<div class="message user-message">${userMessage}</div>`;
+        document.getElementById('userInput').value = '';
+        
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMessage })
+        });
+        
+        const data = await response.json();
+        chatBox.innerHTML += `<div class="message bot-message">${data.reply}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
